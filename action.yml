@@ -1,17 +1,20 @@
 name: 'notion-to-markdown-action'
-description: ''
+description: 'Download notion pages to markdown files.'
 author: 'ega4432'
 inputs:
   notion_api_key:
     required: true
-    description: ''
+    description: 'API key of Notion integrations.'
   notion_database_id:
     required: true
-    description: ''
-  output:
+    description: 'Database ID of target Notion page.'
+  output_path:
     required: false
-    description: ''
+    description: 'Directory path to output files.'
     default: 'output'
 runs:
   using: 'node16'
   main: 'dist/index.js'
+branding:
+  icon: 'download-cloud'
+  color: 'blue'
