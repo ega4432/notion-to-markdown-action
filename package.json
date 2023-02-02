@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
-  "version": "0.0.0",
+  "name": "notion-to-markdown-action",
+  "version": "0.1.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Convert notion pages to markdown files action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -11,33 +11,44 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "npm-run-all -p format lint test -s build package"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/ega4432/notion-markdown-action.git"
   },
   "keywords": [
     "actions",
     "node",
-    "setup"
+    "notion",
+    "markdown"
   ],
-  "author": "",
+  "author": "ega4432",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@notionhq/client": "^2.2.3",
+    "@types/js-yaml": "^4.0.5",
+    "js-yaml": "^4.1.0",
+    "notion-to-md": "^2.5.5",
+    "prettier": "^2.8.3"
   },
   "devDependencies": {
-    "@types/node": "^18.11.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
     "@vercel/ncc": "^0.31.1",
     "eslint": "^7.32.0",
-    "eslint-plugin-github": "^4.3.2",
-    "eslint-plugin-jest": "^25.3.2",
+    "eslint-plugin-jest": "^27.2.1",
     "jest": "^27.2.5",
-    "js-yaml": "^4.1.0",
-    "prettier": "2.5.1",
+    "npm-run-all": "^4.1.5",
     "ts-jest": "^27.1.2",
     "typescript": "^4.4.4"
+  },
+  "packageManager": "npm@8.11.0",
+  "engines": {
+    "npm": ">=8.11.0",
+    "yarn": "use npm!",
+    "pnpm": "use npm!"
   }
 }

@@ -1,19 +1,40 @@
-import * as core from '@actions/core'
-import {wait} from './wait'
+import { getInput, setFailed } from '@actions/core';
+import { Client } from '@notionhq/client';
+import { stat, mkdir, writeFile } from 'fs/promises';
 
-async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+import { queryDatabase } from './utils/notion';
+import { convertPagesToMarkdown, MarkdownPage } from './utils/markdown';
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+const run = async (auth: string, databaseId: string, outDir: string) => {
+  const client = new Client({ auth });
+  const pages = await queryDatabase({ client, databaseId });
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
-  }
-}
+  const mdResponse = await convertPagesToMarkdown(client, pages);
 
-run()
+  await createDirectory(outDir);
+
+  await createFiles(mdResponse, outDir);
+};
+
+const createDirectory = async (outDir: string) => {
+  await stat(outDir).catch((e) => {
+    if (e.code === 'ENOENT') {
+      mkdir(outDir, { recursive: true });
+    }
+  });
+};
+
+const createFiles = async (pages: MarkdownPage[], outDir: string) => {
+  pages.forEach(async (markdown) => {
+    // TODO: ファイルの存在チェック
+    await writeFile(`${outDir}/${markdown.title}.md`, markdown.body);
+  });
+};
+
+run(
+  getInput('notion_api_key'),
+  getInput('notion_database_id'),
+  getInput('output')
+).catch((e) => {
+  setFailed(e.message);
+});

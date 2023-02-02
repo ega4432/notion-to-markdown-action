@@ -1,11 +1,17 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'notion-to-markdown-action'
+description: ''
+author: 'ega4432'
 inputs:
-  milliseconds: # change this
+  notion_api_key:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: ''
+  notion_database_id:
+    required: true
+    description: ''
+  output:
+    required: false
+    description: ''
+    default: 'output'
 runs:
   using: 'node16'
   main: 'dist/index.js'
