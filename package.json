@@ -11,7 +11,7 @@
     "lint": "eslint src/**/*.ts",
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm-run-all -p build format lint package test"
+    "all": "npm-run-all -p format lint test -s build package"
   },
   "repository": {
     "type": "git",
@@ -34,14 +34,21 @@
     "prettier": "^2.8.3"
   },
   "devDependencies": {
-    "@types/node": "^18.11.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
     "@vercel/ncc": "^0.31.1",
     "eslint": "^7.32.0",
-    "eslint-plugin-jest": "^25.3.2",
+    "eslint-plugin-jest": "^27.2.1",
     "jest": "^27.2.5",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^27.1.2",
     "typescript": "^4.4.4"
+  },
+  "packageManager": "npm@8.11.0",
+  "engines": {
+    "npm": ">=8.11.0",
+    "yarn": "use npm!",
+    "pnpm": "use npm!"
   }
 }
