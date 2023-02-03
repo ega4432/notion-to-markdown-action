@@ -34,7 +34,7 @@ const createFiles = async (pages: MarkdownPage[], outDir: string) => {
 run(
   getInput('notion_api_key'),
   getInput('notion_database_id'),
-  getInput('output')
+  getInput('output_path')
 ).catch((e) => {
   setFailed(e.message);
 });
