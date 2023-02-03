@@ -5,6 +5,9 @@ import { stat, mkdir, writeFile } from 'fs/promises';
 import { queryDatabase } from './utils/notion';
 import { convertPagesToMarkdown, MarkdownPage } from './utils/markdown';
 
+const auth = process.env.NOTION_API_KEY as string;
+const databaseId = process.env.NOTION_DATABASE_ID as string;
+
 const run = async (auth: string, databaseId: string, outDir: string) => {
   const client = new Client({ auth });
   const pages = await queryDatabase({ client, databaseId });
@@ -31,10 +34,6 @@ const createFiles = async (pages: MarkdownPage[], outDir: string) => {
   });
 };
 
-run(
-  getInput('notion_api_key'),
-  getInput('notion_database_id'),
-  getInput('output_path')
-).catch((e) => {
+run(auth, databaseId, getInput('output_path')).catch((e) => {
   setFailed(e.message);
 });
