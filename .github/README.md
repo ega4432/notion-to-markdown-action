@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: ega4432/notion-to-markdown-action@v0
-        with:
-          notion_api_key: ${{ secrets.NOTION_API_KEY }}
-          notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 ```
 
-## Inputs
+## Environments
 
 ### `notion_api_key`
 
@@ -34,6 +34,8 @@ API key of Notion integrations
 Database ID of target Notion page.
 
 - required
+
+## Inputs
 
 ### `output_path`
 

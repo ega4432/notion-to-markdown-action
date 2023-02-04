@@ -6,12 +6,9 @@ import { format } from 'prettier';
 
 export type Frontmatter = {
   title: string;
-  description: string;
-  image: string;
-  draft: boolean;
-  tags: string[];
   createdAt: string;
   updatedAt: string;
+  [key: string]: string | number | boolean | string[];
 };
 
 export type MarkdownPage = {
@@ -21,7 +18,9 @@ export type MarkdownPage = {
 
 export const convertPagesToMarkdown = async (
   notionClient: Client,
-  pages: (PageObjectResponse & { frontmatter: Frontmatter })[]
+  pages: (PageObjectResponse & {
+    frontmatter: Frontmatter;
+  })[]
 ): Promise<MarkdownPage[]> => {
   const n2m = new NotionToMarkdown({ notionClient });
   return Promise.all(

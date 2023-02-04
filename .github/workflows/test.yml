@@ -24,6 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
-        with:
-          notion_api_key: ${{ secrets.NOTION_API_KEY }}
-          notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
