@@ -17,8 +17,8 @@ jobs:
     steps:
       - uses: ega4432/notion-to-markdown-action@v0
         env:
-          notion_api_key: ${{ secrets.NOTION_API_KEY }}
-          notion_database_id: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 ```
 
 ## Environments

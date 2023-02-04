@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client';
-import { info } from '@actions/core';
+import { debug, info } from '@actions/core';
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.d';
 
 import { Frontmatter } from './markdown';
@@ -13,35 +13,19 @@ type QueryResponse = (PageObjectResponse & {
   frontmatter: Frontmatter;
 })[];
 
-type Property =
-  | 'checkbox'
-  | 'created_time'
-  | 'date'
-  | 'last_edited_time'
-  | 'number'
-  | 'multi_select'
-  | 'rich_text'
-  | 'status'
-  | 'title'
-  | 'url';
-
-const filterProperties: Property[] = [
-  'checkbox',
-  'created_time',
-  'date',
-  'last_edited_time',
-  'number',
-  'multi_select',
-  'rich_text',
-  'status',
-  'title',
-  'url'
-];
-
 export const queryDatabase = async ({
   client,
-  databaseId
+  databaseId // TODO: and properties
 }: QueryRequest): Promise<QueryResponse> => {
+  // const database = await client.databases.retrieve({ database_id: databaseId });
+  // const propertyIds = Object.entries(database.properties)
+  //   .filter(
+  //     ([key, value]) => value.type === 'title' || properties.includes(key)
+  //   )
+  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //   .map(([_, value]) => value.id);
+  // debug(`propertyIds: ${propertyIds}`);
+
   const response = await client.databases.query({
     database_id: databaseId,
     filter: {
@@ -49,136 +33,74 @@ export const queryDatabase = async ({
       last_edited_time: {
         past_week: {}
       }
-    },
-    filter_properties: filterProperties
+    }
+    // TODO: filter_properties: propertyIds
+    // なぜか `::error::APIResponseError: The schema for this database is malformed` になる。API/SDK の仕様がよく分からんので一旦放置
   });
+
+  info(`---> Successfully return response from Notion via API!`);
 
   const pages = response.results.filter(
     (result) => 'properties' in result
   ) as PageObjectResponse[];
 
   return pages.map((page) => {
+    info(`Convert page properties to frontmatter ...`);
     return {
       ...page,
-      frontmatter: arrangeProperties(page)
+      frontmatter: convertPropertiesToFrontmatter(page)
     };
   });
 };
 
-const arrangeProperties = (page: PageObjectResponse) => {
-  const data = {} as Frontmatter;
-
-  // for (const propertyName in page.properties) {
-  //   const propertyValue = page.properties[propertyName];
-  //   switch (propertyName) {
-  //     case 'title':
-  //       // 処理
-  //       console.log(propertyValue)
-  //       break;
-  //     case 'created_at':
-  //       // 処理
-  //       break;
-  //     case 'updated_at':
-  //       // 処理
-  //       break;
-  //     case 'checkbox':
-  //       // 処理
-  //       break;
-  //     case 'multi_select':
-  //       // 処理
-  //       break;
-  //     case 'status':
-  //       // 処理
-  //       break;
-  //     case 'date':
-  //       // 処理
-  //       break;
-  //     case 'rich_text':
-  //       // 処理
-  //       break;
-  //     case 'url':
-  //       // 処理
-  //       break;
-  //     case 'number':
-  //       // 処理
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  // }
-
-  // Object.entries(page.properties).forEach(([key, value]) => {
-
-  // })
-
+const convertPropertiesToFrontmatter = (page: PageObjectResponse) => {
+  const frontmatter = {
+    createdAt: page.created_time,
+    updatedAt: page.last_edited_time
+  } as Frontmatter;
   const properties = page.properties;
+
   for (const property in properties) {
     const value = properties[property];
 
-    // if (value.type === 'title') {
-    //   data.title = value.title.map((v) => v.plain_text).join(' ');
-    // } else if (value.type === 'rich_text') {
-    //   data.description = value.rich_text.map((v) => v.plain_text).join(' ');
-    // } else if (value.type === 'checkbox') {
-    //   data.draft = !value.checkbox;
-    // } else if (value.type === 'multi_select') {
-    //   data.tags = value.multi_select.map((v) => v.name);
-    // } else if (value.type === 'created_time') {
-    //   console.log(value.created_time);
-    // }
-
     switch (value.type) {
       case 'checkbox':
-        data.draft = !value.checkbox;
+        frontmatter[property] = !value.checkbox;
         break;
-      case 'created_time':
-        data.createdAt = convertDateToString(value.created_time);
+      case 'date': {
+        let date = value.date?.start ?? '';
+        if (value.date && value.date.end) date += ` -> ${value.date.end}`;
+        frontmatter[property] = date;
         break;
-      case 'date':
-        info(
-          value.date
-            ? value.date.start +
-                ' ' +
-                value.date.end +
-                ' ' +
-                value.date.time_zone
-            : ''
-        );
-        break;
-      case 'last_edited_time':
-        data.updatedAt = convertDateToString(value.last_edited_time);
-        break;
+      }
       case 'number':
-        info(value.number ? value.number.toString() : '');
+        frontmatter[property] = value.number ?? '';
         break;
       case 'multi_select':
-        data.tags = value.multi_select.map((v) => v.name);
+        frontmatter[property] = value.multi_select.map((v) => v.name);
         break;
       case 'rich_text':
-        data.description = value.rich_text.map((v) => v.plain_text).join(' ');
+        frontmatter[property] = value.rich_text
+          .map((v) => v.plain_text)
+          .join(' ');
         break;
       case 'status':
-        info(value.status ? value.status.name : '');
+        frontmatter[property] = value.status?.name ?? '';
         break;
       case 'title':
-        data.title = value.title.map((v) => v.plain_text).join(' ');
+        frontmatter.title = value.title.map((v) => v.plain_text).join(' ');
         break;
       case 'url':
-        info(value.url || '');
+        frontmatter[property] = value.url ?? '';
         break;
       default:
-        info(`${value.type} is not supported.`);
+        debug(`${property} is not supported.`);
         break;
     }
   }
-  // TODO: image, createdAt. updatedAt
-  return data;
-};
 
-const convertDateToString = (dateStr: string): string => {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
+  info(`---> Successfully converted page properties to frontmatter.`);
+
+  // TODO: image, createdAt. updatedAt
+  return frontmatter;
 };
