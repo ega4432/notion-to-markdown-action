@@ -26,13 +26,13 @@ jobs:
 
 ## Environments
 
-### `notion_api_key`
+### `NOTION_API_KEY`
 
 API key of Notion integrations
 
 - required
 
-### `notion_database_id`
+### `NOTION_DATABASE_ID`
 
 Database ID of target Notion page.
 
