@@ -23,8 +23,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
       - uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
