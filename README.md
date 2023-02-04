@@ -1,12 +1,5 @@
 # notion-to-markdown-action
 
-[![build-test](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/test.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/test.yml)
-[![Check dist/](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/check-dist.yml)
-
-## Overview
-
-This action converts and downloads pages that exist in Notion's specified database to a markdown files.
-
 ## Usage
 
 `.github/workflows/download.yml`
