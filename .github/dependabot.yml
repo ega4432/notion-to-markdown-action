@@ -4,8 +4,16 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    assignees:
+      - "dependabot"
+    reviewers:
+      - "ega4432"
 
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    assignees:
+      - "dependabot"
+    reviewers:
+      - "ega4432"

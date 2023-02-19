@@ -1,28 +1,36 @@
 name: 'build-test'
+
 on: # rebuild any PRs and main branch changes
   pull_request:
   push:
     branches:
       - main
-      - 'releases/*'
+      - 'v*'
 
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v3
+
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version-file: .tool-versions
           cache: 'npm'
           cache-dependency-path: package-lock.json
+
       - run: npm install
-      - run: npm run all
+
+      - run: npm run all # exec: [ prettier, eslint, test, build, package ]
+
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
       - uses: actions/checkout@v3
+
       - uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
