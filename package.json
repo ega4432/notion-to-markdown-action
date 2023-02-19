@@ -33,7 +33,7 @@
     "@notionhq/client": "^2.2.3",
     "js-yaml": "^4.1.0",
     "notion-to-md": "^2.5.5",
-    "prettier": "^2.8.3"
+    "prettier": "^2.8.4"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.5",
