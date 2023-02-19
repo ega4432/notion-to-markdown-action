@@ -23,7 +23,7 @@ jobs:
       - name: Fetch metadata
         uses: dependabot/fetch-metadata@v1
         with:
-          GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
+          github-token: ${{ steps.my_app.outputs.token }}
         id: metadata
 
       - name: Approve
