@@ -18,11 +18,11 @@ const run = async (auth: string, databaseId: string, outDir: string) => {
 
   const pages = await queryDatabase({ client, databaseId });
 
-  info(`Convert notion pages to markdown files ...`);
+  info('Convert notion pages to markdown files ...');
 
   const mdResponse = await convertPagesToMarkdown(client, pages);
 
-  info(`---> Successfully converted from notion pages to markdown files!`);
+  info('---> Successfully converted from notion pages to markdown files!');
 
   await mkdirP(outDir);
 
@@ -30,13 +30,15 @@ const run = async (auth: string, databaseId: string, outDir: string) => {
 
   await createFiles(mdResponse, outDir);
 
-  info(`---> Successfully created markdown files!`);
+  info('---> Successfully created markdown files!');
 };
 
 const createFiles = async (pages: MarkdownPage[], outDir: string) => {
   pages.forEach(async (markdown) => {
-    // TODO: ファイルの存在チェック
-    await writeFile(`${outDir}/${markdown.title}.md`, markdown.body);
+    if (markdown.filename.length) {
+      // TODO: ファイルの存在チェック
+      await writeFile(`${outDir}/${markdown.filename}.md`, markdown.body);
+    }
   });
 };
 
