@@ -3,6 +3,7 @@ import { NotionToMarkdown } from 'notion-to-md';
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.d';
 import { dump } from 'js-yaml';
 import { format } from 'prettier';
+import { slug } from 'github-slugger';
 
 export type Frontmatter = {
   title: string;
@@ -12,7 +13,7 @@ export type Frontmatter = {
 };
 
 export type MarkdownPage = {
-  title: string;
+  filename: string;
   body: string;
 };
 
@@ -28,7 +29,7 @@ export const convertPagesToMarkdown = async (
       const frontmatter = renderedMatter(page.frontmatter);
       const markdown = await pageToMarkdown(n2m, page.id);
       return {
-        title: page.frontmatter.title,
+        filename: slug(page.frontmatter.title),
         body: format([frontmatter, markdown].join('\n'), { parser: 'markdown' })
       };
     })
@@ -42,5 +43,5 @@ const pageToMarkdown = async (n2m: NotionToMarkdown, pageId: string) => {
 
 const renderedMatter = (matter: Frontmatter) => {
   const dumped = dump(matter, { forceQuotes: true });
-  return [`---`, dumped, `---`].join('\n');
+  return ['---', dumped, '---'].join('\n');
 };
