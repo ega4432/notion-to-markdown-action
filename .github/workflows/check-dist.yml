@@ -47,10 +47,12 @@ jobs:
           fi
         id: diff
 
-      # If index.js was different than expected, upload the expected version as an artifact
-      # TODO: commit 時にローカルで `npm run package` をする必要があるのでそれを GitHub Actions で実行するようにする
-      - uses: actions/upload-artifact@v3
+      # NOTE: src/ と dist/ が一致することを保証するため差分があれば commit する
+      - name: Commit dist/
         if: ${{ failure() && steps.diff.conclusion == 'failure' }}
-        with:
-          name: dist
-          path: dist/
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dist/
+          git commit -m '[github-action] update dist'
+          git push
