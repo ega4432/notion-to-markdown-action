@@ -24,11 +24,15 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - name: Output event name
-        run: |
-          echo "event name: ${{ github.event_name }}"
-
-      - uses: actions/checkout@v3
+      - name: Checkout on `pull_request`
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+      
+      - name: Checkout on not `pull_request`
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v3
 
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
@@ -45,14 +49,21 @@ jobs:
           npm run build
           npm run package
 
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.MY_APP_ID }}
+          private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+        id: my_app
+
       - name: Configure git
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git remote set-url --push origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git remote set-url --push origin "https://${{ github.actor }}:${{ steps.my_app.outputs.token }}@github.com/${{ github.repository }}"
 
       - name: Compare the expected and actual dist/ directories
-        run: |         
+        run: |
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build.  See status below:"
             git diff
