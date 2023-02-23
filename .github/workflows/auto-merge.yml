@@ -27,6 +27,7 @@ jobs:
         id: metadata
 
       - name: Approve
+        id: approve
         if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
         run: gh pr review --approve "$PR_URL"
         env:
@@ -34,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
 
       - name: Merge
-        if: success()
+        if: ${{ steps.approve.conclusion == 'success' }}
         run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
