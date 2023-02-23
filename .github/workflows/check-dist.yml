@@ -71,4 +71,4 @@ jobs:
           git config --local user.name "GitHub Action"
           git add dist/
           git commit --author=. -m '[github-action] update dist'
-          git push
+          git push origin HEAD:${{ github.head_ref }}
