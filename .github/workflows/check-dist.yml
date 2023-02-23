@@ -21,7 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v3
+      - name: Output event name
+        run: |
+          echo "event name: ${{ github.event_name }}"
+
+      - if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v3
 
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
@@ -40,14 +50,22 @@ jobs:
 
       - name: Compare the expected and actual dist/ directories
         run: |
-          if [ "$(git diff --ignore-space-at-eol --text dist/ | wc -l)" -gt "0" ]; then
+          set -eux
+          if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
             echo "Detected uncommitted changes after build.  See status below:"
             git diff
             exit 1
           fi
         id: diff
+        continue-on-error: true
 
       # NOTE: src/ と dist/ が一致することを保証するため差分があれば commit する
-      - name: Commit dist/
-        if: ${{ failure() && steps.diff.conclusion == 'failure' }}
-        run: echo "diff is found!"
+      - name: Commit dist/ in the case of `pull_request` event
+        if: ${{ github.event_name == 'pull_request' && steps.diff.outcome == 'failure' }}
+        run: |
+          set -eux
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dist/
+          git commit --author ${{ github.author }} -m '[github-action] update dist'
+          git push
