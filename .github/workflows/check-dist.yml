@@ -76,6 +76,11 @@ jobs:
       - name: Commit and push dist/ in the case of `pull_request` event
         if: ${{ github.event_name == 'pull_request' && steps.diff.outcome == 'failure' }}
         run: |
+          branch="update-dist"
+          git switch -c ${branch}
           git add dist/
           git commit --author=. -m '[github-action] Automatically update dist'
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin ${branch}
+          gh pr create -B ${{ github.head_ref }} -H ${branch} -a ${{ github.actor }} -t 'Update dist/' -b ''
+        env:
+          GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
