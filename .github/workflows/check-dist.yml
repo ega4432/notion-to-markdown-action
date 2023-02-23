@@ -6,33 +6,58 @@
 name: Check dist/
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
   pull_request:
     paths-ignore:
       - '**.md'
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   check-dist:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v3
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Generate token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.MY_APP_ID }}
+          private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+        id: my_app
+
+      - name: Checkout on `pull_request`
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ steps.my_app.outputs.token }}
+
+      - name: Checkout on not `pull_request`
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v3
+
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
         with:
           node-version-file: .tool-versions
           cache: 'npm'
           cache-dependency-path: package-lock.json
+
       - name: Install dependencies
         run: npm ci
+
       - name: Rebuild the dist/ directory
         run: |
           npm run build
           npm run package
+
+      - name: Configure git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
       - name: Compare the expected and actual dist/ directories
         run: |
           if [ "$(git diff --ignore-space-at-eol dist/ | wc -l)" -gt "0" ]; then
@@ -41,11 +66,12 @@ jobs:
             exit 1
           fi
         id: diff
+        continue-on-error: true
 
-      # If index.js was different than expected, upload the expected version as an artifact
-      # TODO: commit 時に `npm run package` をする必要があるのでそれを GitHub Actions で実行するようにする
-      - uses: actions/upload-artifact@v3
-        if: ${{ failure() && steps.diff.conclusion == 'failure' }}
-        with:
-          name: dist
-          path: dist/
+      # NOTE: src/ と dist/ が一致することを保証するため差分があれば commit する
+      - name: Commit and push dist/ in the case of `pull_request` event
+        if: ${{ github.event_name == 'pull_request' && steps.diff.outcome == 'failure' }}
+        run: |
+          git add dist/
+          git commit --author=. -m '[github-action] Automatically update dist'
+          git push

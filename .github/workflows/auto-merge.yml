@@ -1,0 +1,42 @@
+name: auto-merge
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: write
+
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
+    steps:
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.MY_APP_ID }}
+          private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+        id: my_app
+
+      - name: Fetch metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: ${{ steps.my_app.outputs.token }}
+        id: metadata
+
+      - name: Approve
+        id: approve
+        if: ${{ steps.metadata.outputs.update-type == 'version-update:semver-patch' }}
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
+
+      - name: Merge
+        if: ${{ steps.approve.conclusion == 'success' }}
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
