@@ -72,9 +72,18 @@ jobs:
           git config --local user.name "GitHub Action"
           git add dist/
           git commit --author=. -m '[github-action] update dist'
+      
+      - name: Generate token
+        id: my_app
+        if: ${{ steps.commit.outcome == 'success' }}
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.MY_APP_ID }}
+          private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+
       - name: Push changes
-        if: ${{ github.event_name == 'pull_request' && steps.commit.outcome == 'success' }}
+        if: ${{ steps.commit.outcome == 'success' && steps.my_app.outcome == 'success' }}
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ steps.my_app.outputs.token }}
           branch: ${{ github.head_ref }}
