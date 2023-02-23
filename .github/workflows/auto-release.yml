@@ -30,7 +30,7 @@ jobs:
           git config --local user.name "GitHub Actions"
 
       - name: Tag new target
-        run: git tag -f ${{ github.event.inputs.main_version }} ${{ github.event.inputs.tag_name }}
+        run: git tag -f -a -m "" ${{ github.event.inputs.main_version }} ${{ github.event.inputs.tag_name }}
 
       - name: Push new tag
         run: git push origin ${{ github.event.inputs.main_version }} --force
