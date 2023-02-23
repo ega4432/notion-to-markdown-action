@@ -24,7 +24,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - name: Generate token
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Generate token
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.MY_APP_ID }}
@@ -37,7 +38,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           token: ${{ steps.my_app.outputs.token }}
-      
+
       - name: Checkout on not `pull_request`
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v3
@@ -61,7 +62,6 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          # git remote set-url --push origin "https://${{ github.actor }}:${{ steps.my_app.outputs.token }}@github.com/${{ github.repository }}"
 
       - name: Compare the expected and actual dist/ directories
         run: |
@@ -77,12 +77,6 @@ jobs:
       - name: Commit and push dist/ in the case of `pull_request` event
         if: ${{ github.event_name == 'pull_request' && steps.diff.outcome == 'failure' }}
         run: |
-          # branch="update-dist"
-          # git switch -c ${branch}
           git add dist/
           git commit --author=. -m '[github-action] Automatically update dist'
           git push
-          # git push origin ${branch}
-          # gh pr create -B ${{ github.head_ref }} -H ${branch} -a ${{ github.actor }} -t 'Update dist/' -b ''
-        # env:
-        #  GITHUB_TOKEN: ${{ steps.my_app.outputs.token }}
