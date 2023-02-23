@@ -1,6 +1,6 @@
 {
   "name": "notion-to-markdown-action",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "private": true,
   "description": "Convert notion pages to markdown files action",
   "main": "lib/main.js",

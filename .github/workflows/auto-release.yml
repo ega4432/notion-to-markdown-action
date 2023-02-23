@@ -1,0 +1,45 @@
+name: auto-release
+run-name: Move ${{ github.event.inputs.main_version }} to ${{ github.event.inputs.tag_name }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: The tag or reference to use
+        required: true
+      main_version:
+        type: choice
+        description: The main version to update
+        options:
+          - v0
+
+jobs:
+  auto-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Configure git
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Tag new target
+        run: git tag -f ${{ github.event.inputs.main_version }} ${{ github.event.inputs.tag_name }}
+
+      - name: Push new tag
+        run: git push origin ${{ github.event.inputs.main_version }} --force
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ github.event.inputs.tag_name }}
+          tag_name: ${{ github.event.inputs.tag_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
