@@ -64,6 +64,7 @@ jobs:
 
       # NOTE: src/ と dist/ が一致することを保証するため差分があれば commit する
       - name: Commit dist/ in the case of `pull_request` event
+        id: commit
         if: ${{ github.event_name == 'pull_request' && steps.diff.outcome == 'failure' }}
         run: |
           set -eux
@@ -71,4 +72,9 @@ jobs:
           git config --local user.name "GitHub Action"
           git add dist/
           git commit --author=. -m '[github-action] update dist'
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Push changes
+        if: ${{ github.event_name == 'pull_request' && steps.commit.outcome == 'success' }}
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
