@@ -39,13 +39,13 @@ const run = async (auth: string, databaseId: string, outDir: string) => {
 };
 
 const createFiles = async (pages: MarkdownPage[], outDir: string) => {
-  pages.forEach(async (markdown) => {
+  for (const markdown of pages) {
     if (markdown.filename.length) {
-      // TODO: ファイルの存在チェック
+      // NOTE: 現状すでにファイルが存在していても上書きする
       await writeFile(`${outDir}/${markdown.filename}.md`, markdown.body);
       await downloadImages(markdown.filename, outDir);
     }
-  });
+  }
 };
 
 const downloadImages = async (filename: string, outDir: string) => {
@@ -60,7 +60,7 @@ const downloadImages = async (filename: string, outDir: string) => {
       if (!alt) untitledCount++;
       const res = await get(src, { responseType: 'arraybuffer' });
       const image = `${filename}/${alt || `untitled${untitledCount}`}.png`;
-      await writeFile(`${outDir}/${image}`, res.data);
+      await writeFile(`${outDir}/${image}`, res.data, 'binary');
 
       replaced = replaced.replace(src, image);
     }
