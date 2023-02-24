@@ -4,6 +4,7 @@ import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.d';
 import { dump } from 'js-yaml';
 import { format } from 'prettier';
 import { slug } from 'github-slugger';
+import { readFile } from 'fs/promises';
 
 export type Frontmatter = {
   title: string;
@@ -15,6 +16,11 @@ export type Frontmatter = {
 export type MarkdownPage = {
   filename: string;
   body: string;
+};
+
+type MarkdownImage = {
+  alt: string;
+  src: string;
 };
 
 export const convertPagesToMarkdown = async (
@@ -44,4 +50,27 @@ const pageToMarkdown = async (n2m: NotionToMarkdown, pageId: string) => {
 const renderedMatter = (matter: Frontmatter) => {
   const dumped = dump(matter, { forceQuotes: true });
   return ['---', dumped, '---'].join('\n');
+};
+
+export const findImagesFromMarkdown = async (filename: string) => {
+  const content = await readFile(filename, 'utf-8');
+  const regex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+  const images: MarkdownImage[] = [];
+  let match;
+  while ((match = regex.exec(content))) {
+    const [, alt, src] = match;
+    if (!src) continue;
+    if (
+      src.includes('secure.notion-static.com') &&
+      src.includes('X-Amz-Algorithm') &&
+      src.includes('X-Amz-Content-Sha256') &&
+      src.includes('X-Amz-Credential') &&
+      src.includes('X-Amz-Date') &&
+      src.includes('X-Amz-SignedHeaders') &&
+      src.includes('X-Amz-Signature')
+    ) {
+      images.push({ alt: alt ? slug(alt) : '', src });
+    }
+  }
+  return { images, content };
 };
