@@ -10,6 +10,10 @@ import {
   findImagesFromMarkdown,
   MarkdownPage
 } from './utils/markdown';
+import {
+  DEFAULT_FILENAME_PROPERTY,
+  DEFAULT_OUTPUT_DIR
+} from './utils/constants';
 
 const auth = process.env.NOTION_API_KEY as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
@@ -81,8 +85,8 @@ const downloadImages = async (filename: string, outDir: string) => {
 run(
   auth,
   databaseId,
-  getInput('output_path'),
-  getInput('filename_property')
+  getInput('output_path') || DEFAULT_OUTPUT_DIR,
+  getInput('filename_property') || DEFAULT_FILENAME_PROPERTY
 ).catch((e) => {
   error(e);
   setFailed(e.message);
