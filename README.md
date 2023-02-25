@@ -2,6 +2,8 @@
 
 [![build-test](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/test.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/test.yml)
 [![Check dist/](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/check-dist.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/check-dist.yml)
+[![auto-merge](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/auto-merge.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/auto-merge.yml)
+[![auto-release](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/auto-release.yml/badge.svg)](https://github.com/ega4432/notion-to-markdown-action/actions/workflows/auto-release.yml)
 
 ## Overview
 

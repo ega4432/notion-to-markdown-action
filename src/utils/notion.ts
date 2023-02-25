@@ -38,19 +38,16 @@ export const queryDatabase = async ({
     // なぜか `::error::APIResponseError: The schema for this database is malformed` になる。API/SDK の仕様がよく分からんので一旦放置
   });
 
-  info(`---> Successfully return response from Notion via API!`);
+  info('---> Successfully return response from Notion via API!');
 
   const pages = response.results.filter(
     (result) => 'properties' in result
   ) as PageObjectResponse[];
 
-  return pages.map((page) => {
-    info(`Convert page properties to frontmatter ...`);
-    return {
-      ...page,
-      frontmatter: convertPropertiesToFrontmatter(page)
-    };
-  });
+  return pages.map((page) => ({
+    ...page,
+    frontmatter: convertPropertiesToFrontmatter(page)
+  }));
 };
 
 const convertPropertiesToFrontmatter = (page: PageObjectResponse) => {
@@ -69,7 +66,7 @@ const convertPropertiesToFrontmatter = (page: PageObjectResponse) => {
         break;
       case 'date': {
         let date = value.date?.start ?? '';
-        if (value.date && value.date.end) date += ` -> ${value.date.end}`;
+        if (value.date?.end) date += ` -> ${value.date.end}`;
         frontmatter[property] = date;
         break;
       }
@@ -98,8 +95,6 @@ const convertPropertiesToFrontmatter = (page: PageObjectResponse) => {
         break;
     }
   }
-
-  info(`---> Successfully converted page properties to frontmatter.`);
 
   // TODO: image, createdAt. updatedAt
   return frontmatter;
