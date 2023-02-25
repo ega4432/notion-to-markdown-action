@@ -31,6 +31,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - run: |
+          pwd
+          ls -l
+          ls -1 | wc -l
+
       - uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
@@ -38,7 +43,10 @@ jobs:
           ACTIONS_STEP_DEBUG: true
           ACTIONS_RUNNER_DEBUG: true
 
-      - run: ls -l output
+      - run: |
+          pwd
+          ls -l output
+          ls -1 | wc -l
 
   output-path-test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
@@ -47,6 +55,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.head_ref }}
+
+      - run: |
+          pwd
+          ls -l
+          ls -1 | wc -l
 
       - uses: ./
         with:
@@ -57,7 +70,10 @@ jobs:
           ACTIONS_STEP_DEBUG: true
           ACTIONS_RUNNER_DEBUG: true
 
-      - run: ls -l some/dir/
+      - run: |
+          pwd
+          ls -l some/dir/
+          ls -1 some/dir/ | wc -l
 
   # filename-prop-test: # make sure the action works on a clean machine without building
   #   runs-on: ubuntu-latest
