@@ -1,7 +1,7 @@
-import { getInput, setFailed, info, error } from '@actions/core';
+import { getInput, setFailed, info, error, setOutput } from '@actions/core';
 import { mkdirP } from '@actions/io';
 import { Client } from '@notionhq/client';
-import { writeFile } from 'fs/promises';
+import { readdir, writeFile } from 'fs/promises';
 import get from 'axios';
 
 import { queryDatabase } from './utils/notion';
@@ -45,6 +45,9 @@ const run = async (
   info(`---> Successfully created directory! : ${outDir}`);
 
   await createFiles(mdResponse, outDir);
+
+  const files = await readdir(outDir);
+  setOutput('files_count', files.length.toString());
 
   info('---> Successfully created markdown files!');
 };
