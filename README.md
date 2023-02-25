@@ -11,10 +11,10 @@ This action converts and downloads pages that exist in Notion's specified databa
 
 ## Usage
 
-`.github/workflows/download.yml`
+`.github/workflows/import.yml`
 
 ```yaml
-name: download
+name: import
 
 on:
   schedule:

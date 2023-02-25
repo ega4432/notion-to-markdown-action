@@ -27,15 +27,17 @@ export const convertPagesToMarkdown = async (
   notionClient: Client,
   pages: (PageObjectResponse & {
     frontmatter: Frontmatter;
-  })[]
+  })[],
+  prop: string
 ): Promise<MarkdownPage[]> => {
   const n2m = new NotionToMarkdown({ notionClient });
   return Promise.all(
     pages.map(async (page) => {
       const frontmatter = renderedMatter(page.frontmatter);
       const markdown = await pageToMarkdown(n2m, page.id);
+      const filename = slug(detectFilenameFromProperty(page.frontmatter, prop));
       return {
-        filename: slug(page.frontmatter.title),
+        filename,
         body: format([frontmatter, markdown].join('\n'), { parser: 'markdown' })
       };
     })
@@ -73,4 +75,14 @@ export const findImagesFromMarkdown = async (filename: string) => {
     }
   }
   return { images, content };
+};
+
+const detectFilenameFromProperty = (frontmatter: Frontmatter, prop: string) => {
+  if (prop === 'title' || !(prop in frontmatter)) {
+    return frontmatter.title;
+  }
+
+  return typeof frontmatter[prop] === 'string'
+    ? (frontmatter[prop] as string)
+    : frontmatter.title;
 };
