@@ -1,7 +1,14 @@
-import { getInput, setFailed, info, error } from '@actions/core';
+import {
+  getInput,
+  setFailed,
+  info,
+  error,
+  setOutput,
+  debug
+} from '@actions/core';
 import { mkdirP } from '@actions/io';
 import { Client } from '@notionhq/client';
-import { writeFile } from 'fs/promises';
+import { readdir, writeFile } from 'fs/promises';
 import get from 'axios';
 
 import { queryDatabase } from './utils/notion';
@@ -46,17 +53,23 @@ const run = async (
 
   await createFiles(mdResponse, outDir);
 
+  const files = await readdir(outDir);
+  debug(`Output: files_count=${files.length.toString()}`);
+  setOutput('files_count', files.length.toString());
+
   info('---> Successfully created markdown files!');
 };
 
 const createFiles = async (pages: MarkdownPage[], outDir: string) => {
-  for (const markdown of pages) {
+  pages.forEach(async (markdown) => {
     if (markdown.filename.length) {
       // NOTE: 現状すでにファイルが存在していても上書きする
-      await writeFile(`${outDir}/${markdown.filename}.md`, markdown.body);
+      const filename = `${outDir}/${markdown.filename}.md`;
+      await writeFile(filename, markdown.body);
+      debug(`Created: ${filename}`);
       await downloadImages(markdown.filename, outDir);
     }
-  }
+  });
 };
 
 const downloadImages = async (filename: string, outDir: string) => {
@@ -72,6 +85,8 @@ const downloadImages = async (filename: string, outDir: string) => {
       const res = await get(src, { responseType: 'arraybuffer' });
       const image = `${filename}/${alt || `untitled${untitledCount}`}.png`;
       await writeFile(`${outDir}/${image}`, res.data, 'binary');
+
+      debug(`Created image: ${outDir}/${image}`);
 
       replaced = replaced.replace(src, image);
     }

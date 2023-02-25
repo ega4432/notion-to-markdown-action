@@ -29,10 +29,9 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
 
       - name: Normal test
+        id: import
         uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
@@ -41,6 +40,7 @@ jobs:
           ACTIONS_RUNNER_DEBUG: true
 
       - name: Specific property as a markdown filename
+        id: import2
         uses: ./
         with:
           filename_property: 'slug'
@@ -49,3 +49,8 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           ACTIONS_STEP_DEBUG: true
           ACTIONS_RUNNER_DEBUG: true
+
+      - name: Check output
+        run: |
+          echo "Normal test: exported count: ${{ steps.import.outputs.files_count }}"
+          echo "Specified property test: exported count: ${{ steps.import2.outputs.files_count }}"
