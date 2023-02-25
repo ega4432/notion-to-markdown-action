@@ -10,13 +10,20 @@ import {
   findImagesFromMarkdown,
   MarkdownPage
 } from './utils/markdown';
-
-const DEFAULT_OUTPUT = 'output';
+import {
+  DEFAULT_FILENAME_PROPERTY,
+  DEFAULT_OUTPUT_DIR
+} from './utils/constants';
 
 const auth = process.env.NOTION_API_KEY as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
 
-const run = async (auth: string, databaseId: string, outDir: string) => {
+const run = async (
+  auth: string,
+  databaseId: string,
+  outDir: string,
+  filenameProperty: string
+) => {
   const client = new Client({ auth });
 
   info('Call "Query a Database" API ...');
@@ -25,7 +32,11 @@ const run = async (auth: string, databaseId: string, outDir: string) => {
 
   info('Convert notion pages to markdown files ...');
 
-  const mdResponse = await convertPagesToMarkdown(client, pages);
+  const mdResponse = await convertPagesToMarkdown(
+    client,
+    pages,
+    filenameProperty
+  );
 
   info('---> Successfully converted from notion pages to markdown files!');
 
@@ -71,7 +82,12 @@ const downloadImages = async (filename: string, outDir: string) => {
   }
 };
 
-run(auth, databaseId, getInput('output_path') || DEFAULT_OUTPUT).catch((e) => {
+run(
+  auth,
+  databaseId,
+  getInput('output_path') || DEFAULT_OUTPUT_DIR,
+  getInput('filename_property') || DEFAULT_FILENAME_PROPERTY
+).catch((e) => {
   error(e);
   setFailed(e.message);
 });

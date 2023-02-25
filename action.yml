@@ -12,6 +12,10 @@ inputs:
     required: false
     description: 'Directory path to output files.'
     default: 'output'
+  filename_property:
+    required: false
+    description: 'A property to be used as the markdown file name.'
+    default: 'title'
 runs:
   using: 'node16'
   main: 'dist/index.js'

@@ -2,10 +2,6 @@ name: 'build-test'
 
 on: # rebuild any PRs and main branch changes
   pull_request:
-  push:
-    branches:
-      - main
-      - 'v*'
 
 jobs:
   build: # make sure build/ci work properly
@@ -13,6 +9,8 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
@@ -29,9 +27,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
-      - uses: ./
+      - name: Normal test
+        uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          ACTIONS_STEP_DEBUG: true
+          ACTIONS_RUNNER_DEBUG: true
+
+      - name: Specific property as a markdown filename
+        uses: ./
+        with:
+          filename_property: 'slug'
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          ACTIONS_STEP_DEBUG: true
+          ACTIONS_RUNNER_DEBUG: true
