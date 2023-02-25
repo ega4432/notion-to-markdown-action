@@ -33,6 +33,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Normal test
+        id: normal
         uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
@@ -40,7 +41,29 @@ jobs:
           ACTIONS_STEP_DEBUG: true
           ACTIONS_RUNNER_DEBUG: true
 
+      - name: Check normal test
+        if: ${{ steps.normal.outcome == 'success' }}
+        run: |
+          ls -ltra ./ | grep '*.md'
+
+      - name: Specified output path
+        id: output_path_test
+        uses: ./
+        with:
+          output_path: some/dir
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          ACTIONS_STEP_DEBUG: true
+          ACTIONS_RUNNER_DEBUG: true
+
+      - name: Test specified output path
+        if: ${{ steps.output_path_test.outcome == 'success' }}
+        run: |
+          ls -ltra ./some/dir
+
       - name: Specific property as a markdown filename
+        id: filename_prop
         uses: ./
         with:
           filename_property: 'slug'
@@ -49,3 +72,9 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           ACTIONS_STEP_DEBUG: true
           ACTIONS_RUNNER_DEBUG: true
+
+      # TODO:
+      # - name: Test specified filename prop
+      #   if: ${{ steps.filename_prop.outcome == 'success' }}
+      #   run: |
+      #     ls -ltra

@@ -30,7 +30,8 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         with:
           # Optional
-          output_path: some-dir # default: output
+          output_path: some-dir # default: 'output'
+          filename_property: some-prop # default: 'title'
 ```
 
 ## Environments
