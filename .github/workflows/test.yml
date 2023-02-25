@@ -23,12 +23,23 @@ jobs:
 
       - run: npm run all # exec: [ prettier, eslint, test, build, package ]
 
-  normal-test: # make sure the action works on a clean machine without building
+  test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Generate token
+        uses: tibdex/github-app-token@v1
+        with:
+          app_id: ${{ secrets.MY_APP_ID }}
+          private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
+        id: my_app
+
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ steps.my_app.outputs.token }}
 
       - name: Normal test
         id: import
@@ -41,6 +52,10 @@ jobs:
       - name: Specific property as a markdown filename
         id: import2
         uses: ./
+        env:
+          NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          ACTIONS_STEP_DEBUG: true
         with:
           filename_property: 'slug'
 
