@@ -46,7 +46,8 @@ jobs:
       - run: |
           pwd
           ls -l output
-          ls -1 | wc -l
+          ls -1 output | wc -l
+          ls -l /output
 
   output-path-test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
@@ -74,6 +75,7 @@ jobs:
           pwd
           ls -l some/dir/
           ls -1 some/dir/ | wc -l
+          ls -l /some/dir/
 
   # filename-prop-test: # make sure the action works on a clean machine without building
   #   runs-on: ubuntu-latest
