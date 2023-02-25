@@ -27,78 +27,34 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
+      - name: Checkout source
+        uses: actions/checkout@v3
 
-      - run: |
-          pwd
-          ls -l
-          ls -1 | wc -l
-
-      - uses: ./
+      - name: Normal test
+        id: import
+        uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           ACTIONS_STEP_DEBUG: true
-          ACTIONS_RUNNER_DEBUG: true
 
-      - run: |
-          pwd
-          ls -l output
-          ls -1 output | wc -l
-          ls -l /output
-
-  output-path-test: # make sure the action works on a clean machine without building
-    runs-on: ubuntu-latest
-    timeout-minutes: 1
-    steps:
-      - uses: actions/checkout@v3
+      - name: Specific property as a markdown filename
+        id: import2
+        uses: ./
         with:
-          ref: ${{ github.head_ref }}
+          filename_property: 'slug'
 
-      - run: |
-          pwd
-          ls -l
-          ls -1 | wc -l
-
-      - uses: ./
+      - id: import3
+        uses: ./
         with:
           output_path: some/dir
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
           ACTIONS_STEP_DEBUG: true
-          ACTIONS_RUNNER_DEBUG: true
 
-      - run: |
-          pwd
-          ls -l some/dir/
-          ls -1 some/dir/ | wc -l
-          ls -l /some/dir/
-
-  # filename-prop-test: # make sure the action works on a clean machine without building
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 1
-  #   steps:
-  #     - name: Checkout source
-  #       uses: actions/checkout@v3
-  #       with:
-  #         ref: ${{ github.head_ref }}
-
-  #     - name: Test
-  #       id: filename_prop
-  #       uses: ./
-  #       with:
-  #         filename_property: 'slug'
-  #       env:
-  #         NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-  #         NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-  #         ACTIONS_STEP_DEBUG: true
-  #         ACTIONS_RUNNER_DEBUG: true
-
-  #    TODO:
-  #    - name: Test specified filename prop
-  #      if: ${{ steps.filename_prop.outcome == 'success' }}
-  #      run: |
-  #       ls -l
+      - name: Check output
+        run: |
+          echo "Normal test: exported count: ${{ steps.import.outputs.files_count }}"
+          echo "Specified property test: exported count: ${{ steps.import2.outputs.files_count }}"
+          echo "Specified output test: exported count: ${{ steps.import3.outputs.files_count }}"
