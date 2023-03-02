@@ -39,6 +39,9 @@ export const queryDatabase = async ({
   });
 
   info('---> Successfully return response from Notion via API!');
+  debug(
+    `Response from Notion API: ${JSON.stringify(response.results, null, 2)}`
+  );
 
   const pages = response.results.filter(
     (result) => 'properties' in result
