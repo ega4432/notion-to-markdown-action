@@ -23,46 +23,87 @@ jobs:
 
       - run: npm run all # exec: [ prettier, eslint, test, build, package ]
 
-  test: # make sure the action works on a clean machine without building
+  test-normal:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Normal test
-        id: import1
+        id: import
         uses: ./
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          ACTIONS_STEP_DEBUG: true
-          ACTIONS_RUNNER_DEBUG: true
+
+      - name: Check output
+        run: |
+          echo "exported count: ${{ steps.import.outputs.files_count }}"
+
+      - name: Validate count
+        run: |
+          if [ "$(find ./output -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+            find ./output -type f -name '*.md'
+            exit 1
+          fi
+
+  test-output-path:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Specific output path
-        id: import2
+        id: import
         uses: ./
         with:
           output_path: some/dir
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          ACTIONS_STEP_DEBUG: true
-          ACTIONS_RUNNER_DEBUG: true
+
+      - name: Check output
+        run: |
+          echo "exported count: ${{ steps.import.outputs.files_count }}"
+
+      - name: Validate count
+        run: |
+          if [ "$(find ./some/dir -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+            find ./some/dir -type f -name '*.md'
+            exit 1
+          fi
+
+  test-filename-property:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Specific property as a markdown filename
-        id: import3
+        id: import
         uses: ./
         with:
           filename_property: 'slug'
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-          ACTIONS_STEP_DEBUG: true
-          ACTIONS_RUNNER_DEBUG: true
 
       - name: Check output
         run: |
-          echo "[Normal test] exported count: ${{ steps.import1.outputs.files_count }}"
-          echo "[Specified output directory test] exported count: ${{ steps.import2.outputs.files_count }}"
-          echo "[Specified property test] exported count: ${{ steps.import3.outputs.files_count }}"
+          echo "exported count: ${{ steps.import.outputs.files_count }}"
+
+      - name: Validate count
+        run: |
+          if [ "$(find ./output -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+            find ./output -type f -name '*.md'
+            exit 1
+          fi
