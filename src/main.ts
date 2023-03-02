@@ -8,7 +8,7 @@ import {
 } from '@actions/core';
 import { mkdirP } from '@actions/io';
 import { Client } from '@notionhq/client';
-import { readdir, writeFile } from 'fs/promises';
+import { writeFile } from 'fs/promises';
 import get from 'axios';
 
 import { queryDatabase } from './utils/notion';
@@ -51,25 +51,29 @@ const run = async (
 
   info(`---> Successfully created directory! : ${outDir}`);
 
-  await createFiles(mdResponse, outDir);
+  const count = await createFiles(mdResponse, outDir);
 
-  const files = await readdir(outDir);
-  debug(`Output: files_count=${files.length.toString()}`);
-  setOutput('files_count', files.length.toString());
+  debug(`Output: files_count=${count}`);
+  setOutput('files_count', count.toString());
 
   info('---> Successfully created markdown files!');
 };
 
 const createFiles = async (pages: MarkdownPage[], outDir: string) => {
-  pages.forEach(async (markdown) => {
+  let count = 0;
+
+  for (const markdown of pages) {
     if (markdown.filename.length) {
       // NOTE: 現状すでにファイルが存在していても上書きする
       const filename = `${outDir}/${markdown.filename}.md`;
       await writeFile(filename, markdown.body);
       debug(`Created: ${filename}`);
+      count++;
       await downloadImages(markdown.filename, outDir);
     }
-  });
+  }
+
+  return count;
 };
 
 const downloadImages = async (filename: string, outDir: string) => {

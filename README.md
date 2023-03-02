@@ -51,7 +51,14 @@ Database ID of target Notion page.
 
 ### `output_path`
 
-Directory path to output files.
+You can specify the directory path to output files.
 
 - optional
 - default: `output`
+
+### `filename_property`
+
+You can specify the column of the Notion database to be used as a filename when saving the files.
+
+- optional
+- default: `title`
