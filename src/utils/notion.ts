@@ -65,7 +65,7 @@ const convertPropertiesToFrontmatter = (page: PageObjectResponse) => {
 
     switch (value.type) {
       case 'checkbox':
-        frontmatter[property] = !value.checkbox;
+        frontmatter[property] = value.checkbox;
         break;
       case 'date': {
         let date = value.date?.start ?? '';
