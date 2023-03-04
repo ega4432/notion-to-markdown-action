@@ -24,7 +24,10 @@ jobs:
       - run: npm run all # exec: [ prettier, eslint, test, build, package ]
 
   test-normal:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
@@ -40,18 +43,23 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
       - name: Check output
+        shell: bash
         run: |
           echo "exported count: ${{ steps.import.outputs.files_count }}"
 
       - name: Validate count
+        shell: bash
         run: |
-          if [ "$(find ./output -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+          if [ "$(find ./output -type f -name '*.md' | wc -l | tr -d ' ')" != "${{ steps.import.outputs.files_count }}" ]; then
             find ./output -type f -name '*.md'
             exit 1
           fi
 
   test-output-path:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
@@ -69,18 +77,23 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
       - name: Check output
+        shell: bash
         run: |
           echo "exported count: ${{ steps.import.outputs.files_count }}"
 
       - name: Validate count
+        shell: bash
         run: |
-          if [ "$(find ./some/dir -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+          if [ "$(find ./some/dir -type f -name '*.md' | wc -l | tr -d ' ')" != "${{ steps.import.outputs.files_count }}" ]; then
             find ./some/dir -type f -name '*.md'
             exit 1
           fi
 
   test-filename-property:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
@@ -98,12 +111,14 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
       - name: Check output
+        shell: bash
         run: |
           echo "exported count: ${{ steps.import.outputs.files_count }}"
 
       - name: Validate count
+        shell: bash
         run: |
-          if [ "$(find ./output -type f -name '*.md' | wc -l)" != "${{ steps.import.outputs.files_count }}" ]; then
+          if [ "$(find ./output -type f -name '*.md' | wc -l | tr -d ' ')" != "${{ steps.import.outputs.files_count }}" ]; then
             find ./output -type f -name '*.md'
             exit 1
           fi
