@@ -24,7 +24,10 @@ jobs:
       - run: npm run all # exec: [ prettier, eslint, test, build, package ]
 
   test-normal:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
@@ -51,7 +54,10 @@ jobs:
           fi
 
   test-output-path:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
@@ -80,7 +86,10 @@ jobs:
           fi
 
   test-filename-property:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 3
     steps:
       - name: Checkout source
