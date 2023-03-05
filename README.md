@@ -35,7 +35,7 @@ jobs:
           filename_property: slug # default: title
       # You can check output files count
       - run: |
-          echo "Exported count: ${{ steps.import.outputs.files_count }}
+          echo "Exported count: ${{ steps.import.outputs.files_count }}"
 ```
 
 ## Supported
