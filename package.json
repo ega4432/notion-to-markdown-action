@@ -14,8 +14,7 @@
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm-run-all -p format-check lint test -s build package",
-    "//": "↓↓↓↓↓ NOTE: isn't working ↓↓↓↓↓",
-    "dev": "node --loader ts-node/esm ./src/main.ts",
+    "dev": "ts-node ./src/main.ts",
     "prepare": "husky install"
   },
   "repository": {
