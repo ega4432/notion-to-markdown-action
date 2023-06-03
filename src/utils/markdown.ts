@@ -38,7 +38,9 @@ export const convertPagesToMarkdown = async (
       const filename = slug(detectFilenameFromProperty(page.frontmatter, prop));
       return {
         filename,
-        body: format([frontmatter, markdown].join('\n'), { parser: 'markdown' })
+        body: format([frontmatter, markdown.parent].join('\n'), {
+          parser: 'markdown'
+        })
       };
     })
   );
