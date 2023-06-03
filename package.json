@@ -4,7 +4,6 @@
   "private": true,
   "description": "Convert notion pages to markdown files action",
   "main": "lib/main.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc -w",
@@ -15,6 +14,7 @@
     "package": "ncc build --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm-run-all -p format-check lint test -s build package",
+    "//": "↓↓↓↓↓ NOTE: isn't working ↓↓↓↓↓",
     "dev": "node --loader ts-node/esm ./src/main.ts",
     "prepare": "husky install"
   },

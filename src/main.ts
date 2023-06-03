@@ -11,16 +11,16 @@ import { Client } from '@notionhq/client';
 import { writeFile } from 'fs/promises';
 import get from 'axios';
 
-import { queryDatabase } from './utils/notion.js';
+import { queryDatabase } from './utils/notion';
 import {
   convertPagesToMarkdown,
   findImagesFromMarkdown,
   MarkdownPage
-} from './utils/markdown.js';
+} from './utils/markdown';
 import {
   DEFAULT_FILENAME_PROPERTY,
   DEFAULT_OUTPUT_DIR
-} from './utils/constants.js';
+} from './utils/constants';
 
 const auth = process.env.NOTION_API_KEY as string;
 const databaseId = process.env.NOTION_DATABASE_ID as string;
