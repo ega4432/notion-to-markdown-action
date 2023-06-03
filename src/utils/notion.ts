@@ -2,7 +2,7 @@ import { Client } from '@notionhq/client';
 import { debug, info } from '@actions/core';
 import { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints.d';
 
-import { Frontmatter } from './markdown';
+import { Frontmatter } from './markdown.js';
 
 type QueryRequest = {
   client: Client;
