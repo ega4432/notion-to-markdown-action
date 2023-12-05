@@ -29,14 +29,14 @@ jobs:
 
       - name: Checkout on `pull_request`
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
           token: ${{ steps.my_app.outputs.token }}
 
       - name: Checkout on not `pull_request`
         if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set Node.js 16.x
         uses: actions/setup-node@v3
