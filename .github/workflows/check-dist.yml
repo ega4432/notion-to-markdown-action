@@ -21,7 +21,7 @@ jobs:
     steps:
       - if: ${{ github.event_name == 'pull_request' }}
         name: Generate token
-        uses: tibdex/github-app-token@v1
+        uses: tibdex/github-app-token@v2
         with:
           app_id: ${{ secrets.MY_APP_ID }}
           private_key: ${{ secrets.MY_APP_PRIVATE_KEY }}
