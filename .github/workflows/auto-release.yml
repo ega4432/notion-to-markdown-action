@@ -38,7 +38,7 @@ jobs:
         run: git push origin ${{ github.event.inputs.main_version }} --force
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.event.inputs.tag_name }}
           tag_name: ${{ github.event.inputs.tag_name }}
