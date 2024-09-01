@@ -21,7 +21,7 @@ jobs:
         id: my_app
 
       - name: Fetch metadata
-        uses: dependabot/fetch-metadata@v1
+        uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ steps.my_app.outputs.token }}
         id: metadata
