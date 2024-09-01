@@ -37,7 +37,7 @@
     "github-slugger": "^2.0.0",
     "js-yaml": "^4.1.0",
     "notion-to-md": "^3.1.1",
-    "prettier": "^2.8.8"
+    "prettier": "^3.3.3"
   },
   "devDependencies": {
     "@types/js-yaml": "^4.0.9",
